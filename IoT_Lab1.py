@@ -60,6 +60,7 @@ def getAddress():
         lat = json.loads(data)['lat']
         lon = json.loads(data)['lon']
     return lat, lon
+    
 def main():
     while True:
         locate = getAddress()
