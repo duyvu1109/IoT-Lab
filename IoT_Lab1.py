@@ -5,6 +5,7 @@ import paho.mqtt.client as mqttclient
 import time
 import json
 import random
+# need to implement extra task
 import urllib.request
 
 # default
@@ -54,17 +55,21 @@ latitude = 12.6674
 
 # get longtirude, latitude by IP Adress
 # use http://ip-api.com/json/ API to get location data
+# https://stackoverflow.com/questions/24678308/how-to-find-location-with-ip-address-in-python
 def getAddress():
     lat, lon = 0, 0 
     with urllib.request.urlopen("http://ip-api.com/json/") as url:
         s = url.read()
+        # decode bytes
         data = s.decode('utf-8')
+        # assign latitude and longtitude values
         lat = json.loads(data)['lat']
         lon = json.loads(data)['lon']
     return lat, lon
 
 def main():
     while True:
+        # get latitude and longtitude
         locate = getAddress()
         latitude, longitude = locate[0], locate[1]
         temp, humi = random.randint(0, 100), random.randint(0, 100)
