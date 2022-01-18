@@ -1,7 +1,6 @@
 print("IoT Lab1")
-#####################################################
-#                   import library                  #
-#####################################################
+
+#import needed library
 import paho.mqtt.client as mqttclient
 import time
 import json
@@ -35,9 +34,11 @@ def connected(client, usedata, flags, rc):
     else:
         print("Connection is failed")
 
+# login
 client = mqttclient.Client("Gateway_Thingsboard")
 client.username_pw_set(THINGS_BOARD_ACCESS_TOKEN)
 
+# interrupt
 client.on_connect = connected
 client.connect(BROKER_ADDRESS, 1883)
 client.loop_start()
@@ -60,7 +61,7 @@ def getAddress():
         lat = json.loads(data)['lat']
         lon = json.loads(data)['lon']
     return lat, lon
-    
+
 def main():
     while True:
         locate = getAddress()
