@@ -11,7 +11,7 @@ import urllib.request
 BROKER_ADDRESS = "demo.thingsboard.io"
 # default MQTT port
 PORT = 1883
-THINGS_BOARD_ACCESS_TOKEN = "ni8pcvHQm1pZErHyTJpp"
+THINGS_BOARD_ACCESS_TOKEN = "JRmz4cU7NuwNgu683cuW"
 
 def subscribed(client, userdata, mid, granted_qos):
     print("Subscribed...")
@@ -53,6 +53,7 @@ longitude = 108.0528
 latitude = 12.6674
 
 # get longtirude, latitude by IP Adress
+# use http://ip-api.com/json/ API to get location data
 def getAddress():
     lat, lon = 0, 0 
     with urllib.request.urlopen("http://ip-api.com/json/") as url:
