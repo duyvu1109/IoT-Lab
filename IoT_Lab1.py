@@ -1,10 +1,16 @@
-print("ndvu1109")
+print("IoT Lab1")
+#####################################################
+#                   import library                  #
+#####################################################
 import paho.mqtt.client as mqttclient
 import time
 import json
 import random
+import urllib.request
 
+# default
 BROKER_ADDRESS = "demo.thingsboard.io"
+# default MQTT port
 PORT = 1883
 THINGS_BOARD_ACCESS_TOKEN = "ni8pcvHQm1pZErHyTJpp"
 
@@ -39,10 +45,28 @@ client.loop_start()
 client.on_subscribe = subscribed
 client.on_message = recv_message
 
+# default values
 temp, humi = 0,0
 counter = 0
-while True:
-    temp, humi = random.randint(0, 100), random.randint(0, 100)
-    collect_data = {'temperature': temp, 'humidity': humi}
-    client.publish('v1/devices/me/telemetry', json.dumps(collect_data), 1)
-    time.sleep(10)
+longitude = 108.0528
+latitude = 12.6674
+
+# get longtirude, latitude by IP Adress
+def getAddress():
+    lat, lon = 0, 0 
+    with urllib.request.urlopen("http://ip-api.com/json/") as url:
+        s = url.read()
+        data = s.decode('utf-8')
+        lat = json.loads(data)['lat']
+        lon = json.loads(data)['lon']
+    return lat, lon
+def main():
+    while True:
+        locate = getAddress()
+        latitude, longitude = locate[0], locate[1]
+        temp, humi = random.randint(0, 100), random.randint(0, 100)
+        collect_data = {'temperature': temp, 'humidity': humi, 'longitude': longitude, 'latitude': latitude}
+        client.publish('v1/devices/me/telemetry', json.dumps(collect_data), 1)
+        time.sleep(10)
+
+main()
