@@ -6,6 +6,7 @@ import time
 import json
 import random
 # need to implement extra task
+# https://docs.python.org/3/library/urllib.request.html
 import urllib.request
 
 # default
@@ -50,8 +51,8 @@ client.on_message = recv_message
 # default values
 temp, humi = 0,0
 counter = 0
-longitude = 108.0528
-latitude = 12.6674
+longitude = 106.6297
+latitude = 10.8231
 
 # get longtirude, latitude by IP Adress
 # use http://ip-api.com/json/ API to get location data
