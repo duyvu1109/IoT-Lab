@@ -20,7 +20,7 @@ def getLocateByIP():
     return lat, lon
 
 ##########################################################################################################
-#                              USING #RD TO GET LATITUDE AND LONGTITUDE                                   #
+#                              USING 3RD TO GET LATITUDE AND LONGTITUDE                                  #
 ##########################################################################################################
 
 # use https://www.where-am-i.co/track-my-location to find current locattion
