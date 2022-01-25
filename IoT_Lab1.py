@@ -5,9 +5,9 @@ import paho.mqtt.client as mqttclient
 import time
 import json
 import random
-# need to implement extra task
-# https://docs.python.org/3/library/urllib.request.html
-import urllib.request
+
+# using for get current latitude and longtitude
+from locate import getLocateByWebScraping, getLocateByIP
 
 # default
 BROKER_ADDRESS = "demo.thingsboard.io"
@@ -51,30 +51,19 @@ client.on_message = recv_message
 # default values
 temp, humi = 0,0
 counter = 0
-longitude = 106.6297
-latitude = 10.8231
-
-# get longtirude, latitude by IP Adress
-# use http://ip-api.com/json/ API to get location data
-# https://stackoverflow.com/questions/24678308/how-to-find-location-with-ip-address-in-python
-def getAddress():
-    lat, lon = 0, 0 
-    with urllib.request.urlopen("http://ip-api.com/json/") as url:
-        s = url.read()
-        # decode bytes
-        data = s.decode('utf-8')
-        # assign latitude and longtitude values
-        lat = json.loads(data)['lat']
-        lon = json.loads(data)['lon']
-    return lat, lon
+longitude = 107.70442
+latitude = 16.5283791
 
 def main():
     while True:
         # get latitude and longtitude
-        locate = getAddress()
-        latitude, longitude = locate[0], locate[1]
+        #locate = getLocateByIP()
+        #latitude, longitude = locate[0], locate[1]
+        data = getLocateByWebScraping()
+        latitude, longitude = data[0], data[1]
+
         temp, humi = random.randint(0, 100), random.randint(0, 100)
-        collect_data = {'temperature': temp, 'humidity': humi, 'longitude': longitude, 'latitude': latitude}
+        collect_data = {'temperature': temp, 'humidity': humi, 'longitude': float(longitude), 'latitude': float(latitude)}
         client.publish('v1/devices/me/telemetry', json.dumps(collect_data), 1)
         time.sleep(10)
 
