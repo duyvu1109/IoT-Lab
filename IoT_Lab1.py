@@ -57,10 +57,10 @@ latitude = 16.5283791
 def main():
     while True:
         # get latitude and longtitude
-        #locate = getLocateByIP()
-        #latitude, longitude = locate[0], locate[1]
-        data = getLocateByWebScraping()
-        latitude, longitude = data[0], data[1]
+        locate = getLocateByIP()
+        latitude, longitude = locate[0], locate[1]
+        # data = getLocateByWebScraping()
+        # latitude, longitude = data[0], data[1]
 
         temp, humi = random.randint(0, 100), random.randint(0, 100)
         collect_data = {'temperature': temp, 'humidity': humi, 'longitude': float(longitude), 'latitude': float(latitude)}
