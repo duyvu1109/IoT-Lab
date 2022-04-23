@@ -1,19 +1,47 @@
-print("IoT Lab1")
-
-#import needed library
+print("IoT Gateway")
 import paho.mqtt.client as mqttclient
 import time
 import json
-import random
+import serial.tools.list_ports
 
-# using for get current latitude and longtitude
-from locate import getLocateByWebScraping, getLocateByIP
-
-# default
 BROKER_ADDRESS = "demo.thingsboard.io"
-# default MQTT port
 PORT = 1883
-THINGS_BOARD_ACCESS_TOKEN = "JRmz4cU7NuwNgu683cuW"
+mess = ""
+
+#TODO: Add your token and your comport
+#Please check the comport in the device manager
+THINGS_BOARD_ACCESS_TOKEN = "ZN0RMwEGZFVerXTH3sUM"
+bbc_port = "COM8"
+if len(bbc_port) > 0:
+    ser = serial.Serial(port=bbc_port, baudrate=115200)
+
+def processData(data):
+    data = data.replace("!", "")
+    data = data.replace("#", "")
+    splitData = data.split(":")
+    print(splitData)
+    #TODO: Add your source code to publish data to the server
+    if splitData[1] == "TEMP":
+        splitData[1] = "temp"
+    elif splitData[1] == "HUMI":
+        splitData[1] = "humi"
+    collect_data = {splitData[1]: int(splitData[2])}
+    # print(collect_data)
+    client.publish("v1/devices/me/telemetry", json.dumps(collect_data), 1)
+
+def readSerial():
+    bytesToRead = ser.inWaiting()
+    if (bytesToRead > 0):
+        global mess
+        mess = mess + ser.read(bytesToRead).decode("UTF-8")
+        while ("#" in mess) and ("!" in mess):
+            start = mess.find("!")
+            end = mess.find("#")
+            processData(mess[start:end + 1])
+            if (end == len(mess)):
+                mess = ""
+            else:
+                mess = mess[end+1:]
 
 def subscribed(client, userdata, mid, granted_qos):
     print("Subscribed...")
@@ -21,13 +49,23 @@ def subscribed(client, userdata, mid, granted_qos):
 def recv_message(client, userdata, message):
     print("Received: ", message.payload.decode("utf-8"))
     temp_data = {'value': True}
+    cmd = 1
+    #TODO: Update the cmd to control 2 devices
     try:
         jsonobj = json.loads(message.payload)
-        if jsonobj['method'] == "setValue":
-            temp_data['value'] = jsonobj['params']
-            client.publish('v1/devices/me/attributes', json.dumps(temp_data), 1)
+        if jsonobj["method"] == "setLED":
+            temp_data["value"] = jsonobj["params"]
+            client.publish('v1/devices/me/LedSwitch', json.dumps(temp_data), 1)
+            cmd = 1 if jsonobj["params"] == True else 0
+        if jsonobj["method"] == "setFAN":
+            temp_data["value"] = jsonobj["params"]
+            client.publish('v1/devices/me/FanSwitch', json.dumps(temp_data), 1)
+            cmd = 3 if jsonobj["params"] == True else 2
     except:
         pass
+
+    # if len(bbc_port) > 0:
+    #     ser.write((str(cmd) + "#").encode())
 
 def connected(client, usedata, flags, rc):
     if rc == 0:
@@ -36,11 +74,9 @@ def connected(client, usedata, flags, rc):
     else:
         print("Connection is failed")
 
-# login
 client = mqttclient.Client("Gateway_Thingsboard")
 client.username_pw_set(THINGS_BOARD_ACCESS_TOKEN)
 
-# interrupt
 client.on_connect = connected
 client.connect(BROKER_ADDRESS, 1883)
 client.loop_start()
@@ -48,23 +84,7 @@ client.loop_start()
 client.on_subscribe = subscribed
 client.on_message = recv_message
 
-# default values
-temp, humi = 0,0
-counter = 0
-longitude = 107.70442
-latitude = 16.5283791
-
-def main():
-    while True:
-        # get latitude and longtitude
-        locate = getLocateByIP()
-        latitude, longitude = locate[0], locate[1]
-        # data = getLocateByWebScraping()
-        # latitude, longitude = data[0], data[1]
-
-        temp, humi = random.randint(0, 100), random.randint(0, 100)
-        collect_data = {'temperature': temp, 'humidity': humi, 'longitude': float(longitude), 'latitude': float(latitude)}
-        client.publish('v1/devices/me/telemetry', json.dumps(collect_data), 1)
-        time.sleep(10)
-
-main()
+while True:
+    if len(bbc_port) >  0:
+        readSerial()
+    time.sleep(1)
