@@ -11,7 +11,7 @@ mess = ""
 #TODO: Add your token and your comport
 #Please check the comport in the device manager
 THINGS_BOARD_ACCESS_TOKEN = "ZN0RMwEGZFVerXTH3sUM"
-bbc_port = "COM8"
+bbc_port = "COM11"
 if len(bbc_port) > 0:
     ser = serial.Serial(port=bbc_port, baudrate=115200)
 
@@ -64,8 +64,8 @@ def recv_message(client, userdata, message):
     except:
         pass
 
-    # if len(bbc_port) > 0:
-    #     ser.write((str(cmd) + "#").encode())
+    if len(bbc_port) > 0:
+        ser.write((str(cmd) + "#").encode())
 
 def connected(client, usedata, flags, rc):
     if rc == 0:
