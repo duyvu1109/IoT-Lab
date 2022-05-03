@@ -1,4 +1,5 @@
 print("IoT Gateway")
+
 import paho.mqtt.client as mqttclient
 import time
 import json
