@@ -12,24 +12,43 @@ mess = ""
 #TODO: Add your token and your comport
 #Please check the comport in the device manager
 THINGS_BOARD_ACCESS_TOKEN = "ZN0RMwEGZFVerXTH3sUM"
-bbc_port = "COM11"
+
+# "ZN0RMwEGZFVerXTH3sUM" Vu
+# "X51j2xALmfQR7XllHY5K" Thinh
+
+#bbc_port = "COM11"
+def getPort():
+    ports = serial.tools.list_ports.comports()
+    N = len(ports)
+    commPort = "None"
+    for i in range(0, N):
+        port = ports[i]
+        strPort = str(port)
+        if "USB Serial Device" in strPort:
+            splitPort = strPort.split(" ")
+            commPort = (splitPort[0])
+    return commPort
+bbc_port=getPort()
+
 if len(bbc_port) > 0:
     ser = serial.Serial(port=bbc_port, baudrate=115200)
 
 def processData(data):
-    data = data.replace("!", "")
-    data = data.replace("#", "")
-    splitData = data.split(":")
-    print(splitData)
-    #TODO: Add your source code to publish data to the server
-    if splitData[1] == "TEMP":
-        splitData[1] = "temp"
-    elif splitData[1] == "HUMI":
-        splitData[1] = "humi"
-    collect_data = {splitData[1]: int(splitData[2])}
-    # print(collect_data)
-    client.publish("v1/devices/me/telemetry", json.dumps(collect_data), 1)
-
+    try:
+        print(data)
+        data = data.replace("!", "")
+        data = data.replace("#", "")
+        splitData = data.split(":")
+        #TODO: Add your source code to publish data to the server
+        if splitData[1] == "TEMP":
+            splitData[1] = "temp"
+        elif splitData[1] == "HUMI":
+            splitData[1] = "humi"
+        collect_data = {splitData[1]: int(splitData[2])}
+        # print(collect_data)
+        client.publish("v1/devices/me/telemetry", json.dumps(collect_data), 1)
+    except:
+        pass
 def readSerial():
     bytesToRead = ser.inWaiting()
     if (bytesToRead > 0):
